@@ -1,10 +1,14 @@
+### Installation
+
+    git clone https://bitbucket.org/aecepoglu/easyi3status.git
+    pip install -r requirements.txt
 
 ### Configuration:
 
-    mkdir ~/.easyi3config
-    touch ~/.easyi3config/__init__.py
+    mkdir ~/.easyi3status
+    touch ~/.easyi3status/__init__.py
 
-Then copy your modules into **~/.easyi3config** folder
+Then copy your modules into **~/.easyi3status** folder
 
     #place this in your i3 config
     bar {

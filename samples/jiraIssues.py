@@ -42,7 +42,7 @@ def query():
 	return elements
 
 def get(key):
-	resp = requests.get(JIRA_api + "issue/" + key, auth=(myConfig['username'], myConfig['password']))
+	resp = requests.get(myConfig['api'] + "issue/" + key, auth=(myConfig['username'], myConfig['password']))
 	
 	if resp.status_code != 200:
 		return []
