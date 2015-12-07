@@ -2,30 +2,24 @@ import requests
 import json
 import sys
 
-username=""
-password=""
-JIRA_API = "http://atlassian:8080/rest/api/2/"
-
-queryFilters = [
-	"assignee='" + username + "'",
-	"project=PR",
-        "status!=done",
-        "status!=resolved",
-        "status!=closed"
-]
+myConfig = None
 
 statusColors = {
 	"In Progress": "#268bd2"
 }
 
+def setup(config):
+	global myConfig
+	myConfig = config
+
 def query():
-	resp = requests.get(JIRA_API + "search?jql=" + "+AND+".join(queryFilters), auth=(username, password))
-	
+	resp = requests.get(myConfig['api'] + "search?jql=" + myConfig['filter'], auth=(myConfig['username'], myConfig['password']))
+
 	if resp.status_code != 200:
 		return []
 	
 	jsonobj = resp.json()
-	
+
 	elements = []
 	
 	for it in jsonobj['issues']:
@@ -48,7 +42,7 @@ def query():
 	return elements
 
 def get(key):
-	resp = requests.get(JIRA_API + "issue/" + key, auth=(username, password))
+	resp = requests.get(JIRA_api + "issue/" + key, auth=(myConfig['username'], myConfig['password']))
 	
 	if resp.status_code != 200:
 		return []
@@ -66,7 +60,7 @@ def listActions():
 	return ['resolve', 'start', 'todo']
 
 def transit(key, tId):
-	resp = requests.post(JIRA_API + "issue/" + key + "/transitions", headers={'content-type': 'application/json'}, data=json.dumps({'transition': {'id': tId}}), auth=(username, password))
+	resp = requests.post(myConfig['api'] + "issue/" + key + "/transitions", headers={'content-type': 'application/json'}, data=json.dumps({'transition': {'id': tId}}), auth=(myConfig['username'], myConfig['password']))
 
 def resolve(key):
 	transit(key, 31)

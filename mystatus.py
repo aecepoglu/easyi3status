@@ -4,16 +4,27 @@ import threading
 import sys
 import time
 
-import jiraIssues
+import ConfigParser, os, sys
 
 from sh import zenity, ErrorReturnCode
 
 print '{"version":1, "click_events": true}'
 print '['
 
-modules = {
-	'jira': jiraIssues,
-}
+modules = {}
+
+config = ConfigParser.ConfigParser()
+config.read([
+	os.path.expanduser('~/.easyi3status/config.cfg')
+])
+
+sys.path.append(os.path.expanduser('~/.easyi3status/'))
+
+for name in config.sections():
+	module = __import__(name)
+
+	module.setup( dict(config.items(name)) )
+	modules[name] = module
 
 elements = []
 
@@ -26,7 +37,7 @@ def readModules():
 			elements.append(it)
 	
 	print json.dumps(elements) + ","
-	threading.Timer(300, readModules).start()
+	threading.Timer(10, readModules).start()
 
 readModules()
 
