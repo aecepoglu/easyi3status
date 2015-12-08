@@ -1,0 +1,17 @@
+version 0.0.6
+* modules folder is added to MANIFEST.in
+
+version 0.0.5
+* config file is added to MANIFEST.in
+
+version 0.0.4
+* config path in setup.py is fixed
+
+version 0.0.3
+* config.py -> config.cfg
+
+version 0.0.2
+* added README.md and CHANGES.txt files to pip package
+
+version 0.0.1
+* initial version

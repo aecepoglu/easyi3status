@@ -7,7 +7,7 @@ setup(
     name="EasyI3Status",
 
     # Version number (initial):
-    version="0.0.1",
+    version="0.0.6",
 
     # Application author details:
     author="Ahmet Emre Cepoglu",
@@ -40,6 +40,6 @@ setup(
 	},
 	data_files=[
 		(expanduser("~/.easyi3status/modules"), glob("easyi3status/modules/*")),
-		(expanduser("~/.easyi3status"), ['easyi3status/config.py'])
+		(expanduser("~/.easyi3status"), ['easyi3status/config.cfg'])
 	],
 )

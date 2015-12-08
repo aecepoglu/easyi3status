@@ -31,7 +31,7 @@ class EasyI3Status:
 
 		config = ConfigParser.ConfigParser()
 		config.read([
-			os.path.expanduser('~/.easyi3status/config.py')
+			os.path.expanduser('~/.easyi3status/config.cfg')
 		])
 
 		sys.path.append(os.path.expanduser('~/.easyi3status/modules/'))
