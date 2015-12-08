@@ -1,5 +1,10 @@
 [jiraIssues]
-username = USERNAME
-password = PASSWORD
+# API address without quotes
 API = http://atlassian:8080/rest/api/2/
-filter = assignee='USERNAME'+AND+project=CBINT+AND+status!=done
+# Username without quotes
+username = USERNAME
+# Password without quotes
+password = PASSWORD
+# Project and status lists with quotes
+projects = ["SOME_PROJECT", "SOME_OTHER_PROJECT"]
+statuses = ["status!=resolved","status!=closed"]

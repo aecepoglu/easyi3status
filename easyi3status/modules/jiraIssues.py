@@ -13,7 +13,13 @@ def setup(config):
 	myConfig = config
 
 def query():
-	resp = requests.get(myConfig['api'] + "search?jql=" + myConfig['filter'], auth=(myConfig['username'], myConfig['password']))
+
+	statuses = '+AND+'.join(json.loads(myConfig['statuses']))
+	projects = ','.join(json.loads(myConfig['projects']))
+	reqFilter = "assignee={}+AND+project+in+({})+AND+{}".format("'%s'"%myConfig['username'], projects, statuses)
+	req = myConfig['api'] + "search?jql=" + reqFilter
+
+	resp = requests.get(req, auth=(myConfig['username'], myConfig['password']))
 
 	if resp.status_code != 200:
 		return []
