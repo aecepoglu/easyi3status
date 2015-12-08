@@ -43,7 +43,8 @@ def query():
 			
 		elements.append(elem)
 	
-	elements[-1]['separator_block_width'] = 40
+	if (len(elements) > 0):
+		elements[-1]['separator_block_width'] = 40
 	
 	return elements
 
