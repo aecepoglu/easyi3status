@@ -7,7 +7,7 @@ setup(
     name="EasyI3Status",
 
     # Version number (initial):
-    version="0.0.6",
+    version="0.0.7",
 
     # Application author details:
     author="Ahmet Emre Cepoglu",

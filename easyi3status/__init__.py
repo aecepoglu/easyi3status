@@ -3,6 +3,7 @@ import fileinput
 import threading
 import sys
 import time
+import collections
 
 import ConfigParser, os, sys
 
@@ -11,7 +12,7 @@ from sh import zenity, ErrorReturnCode
 class EasyI3Status:
 
 	sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-	modules = {}
+	modules = collections.OrderedDict()
 
 	def readModules(self):
 		elements = []

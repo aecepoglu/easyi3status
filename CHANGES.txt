@@ -1,3 +1,7 @@
+version 0.0.7
+* modules can now be ordered in config.cfg
+* added date module
+
 version 0.0.6
 * modules folder is added to MANIFEST.in
 
