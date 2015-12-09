@@ -7,8 +7,6 @@ import collections
 
 import ConfigParser, os, sys
 
-from sh import zenity, ErrorReturnCode
-
 class EasyI3Status:
 
 	sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -59,21 +57,8 @@ class EasyI3Status:
 
 			module = self.modules[jsonobj['instance']]
 
-			possibleActions = module.listActions()
-			msg = module.get(jsonobj['name'])
-
-			selected = False
-			while not selected:
-				try:
-					selection = zenity("--entry", "--title", "jira", "--text", msg + "\n(" + "/".join(possibleActions) + ") ?")
-					selection = selection.strip()
-
-					if selection in possibleActions:
-						selected = True
-						method = getattr(module, selection)
-						method(jsonobj['name'])
-				except ErrorReturnCode:
-					selected = True
+			if hasattr(module, 'handleClick'):
+				module.handleClick(jsonobj['name'])
 
 def run():
 	app = EasyI3Status()
