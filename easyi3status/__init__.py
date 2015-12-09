@@ -58,7 +58,7 @@ class EasyI3Status:
 			module = self.modules[jsonobj['instance']]
 
 			if hasattr(module, 'handleClick'):
-				module.handleClick(jsonobj['name'])
+				module.handleClick(jsonobj)
 
 def run():
 	app = EasyI3Status()

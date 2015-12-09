@@ -2,6 +2,8 @@ import requests
 import json
 import sys
 
+from sh import zenity, ErrorReturnCode
+
 myConfig = None
 
 statusColors = {
@@ -9,8 +11,9 @@ statusColors = {
 }
 
 def setup(config):
-	global myConfig
+	global myConfig, myAuth
 	myConfig = config
+	myAuth = (config['username'], config['password'])
 
 def query():
 
@@ -19,7 +22,7 @@ def query():
 	reqFilter = "assignee={}+AND+project+in+({})+AND+{}".format("'%s'"%myConfig['username'], projects, statuses)
 	req = myConfig['api'] + "search?jql=" + reqFilter
 
-	resp = requests.get(req, auth=(myConfig['username'], myConfig['password']))
+	resp = requests.get(req, auth=myAuth)
 
 	if resp.status_code != 200:
 		return []
@@ -48,32 +51,42 @@ def query():
 	
 	return elements
 
-def get(key):
-	resp = requests.get(myConfig['api'] + "issue/" + key, auth=(myConfig['username'], myConfig['password']))
-	
-	if resp.status_code != 200:
-		return []
-	
-	jsonobj = resp.json()
-
-	title = key
-	summary = jsonobj['fields']['summary']
-	description = jsonobj['fields']['description']
-	reporter = jsonobj['fields']['reporter']['name']
-
-	return "%s\n%s\n%s\n\n- %s" % (title, description, summary, reporter)
-
-def listActions():
-	return ['resolve', 'start', 'todo']
-
 def transit(key, tId):
-	resp = requests.post(myConfig['api'] + "issue/" + key + "/transitions", headers={'content-type': 'application/json'}, data=json.dumps({'transition': {'id': tId}}), auth=(myConfig['username'], myConfig['password']))
+	resp = requests.post(myConfig['api'] + "issue/" + key + "/transitions", headers={'content-type': 'application/json'}, data=json.dumps({'transition': {'id': tId}}), auth=myAuth)
 
-def resolve(key):
-	transit(key, 31)
+def handleClick(ev):
+	key = ev['name']
 
-def start(key):
-	transit(key, 21)
+	taskResp = requests.get(myConfig['api'] + 'issue/' + key, auth=myAuth)
+	task = taskResp.json()
 
-def todo(key):
-	transit(key, 11)
+	transitionsResp = requests.get(myConfig['api'] + 'issue/' + key + '/transitions', auth=myAuth)
+
+	currentStatus = task['fields']['status']
+
+	transitions = []
+	for it in transitionsResp.json()['transitions']:
+		if it['to']['id'] != currentStatus['id']:
+			transitions += [it['id'], it['name']]
+	
+	
+	summary = task['fields']['summary']
+	description = task['fields']['description']
+	reporter = task['fields']['reporter']['name']
+
+	if description == None:
+		description = ''
+	
+	try:
+		transitionId = zenity(
+			'--list',
+			'--title', key,
+			'--text', '<b>' + summary + ':</b> ' + description + '\n-<i>' + reporter + '</i>',
+			'--column', 'ID', '--column', 'Transition',
+			transitions
+		).strip()
+
+		if transitionId:
+			transit(key, transitionId)
+	except ErrorReturnCode:
+		pass

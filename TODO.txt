@@ -2,7 +2,7 @@ A TODO list until project is mature enough to start using an issue tracker
 ------------------------
 
 * each module should have a cache-timeout period. If the elements list of a module is still new we don't need to query it
-* add the click event handler in jiraIssues.py
+* [DONE] add the click event handler in jiraIssues.py
 * add a weather module
 * setup should only copy the very basic modules that will work without any configuration (like 'date'). The setup should ask the user about the other modules and install their dependencies only then. Otherwise the users should just manually copy the modules and install the module dependencies
 * confirm the setup doesn't override files in .easyi3status
