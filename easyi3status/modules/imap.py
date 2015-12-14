@@ -60,3 +60,8 @@ def query():
 		elements[-1]['separator_block_width'] = 40
 	
 	return elements
+
+def handleClick(ev):
+	FNULL = open(os.devnull, 'w')
+	ret = subprocess.call(["sensible-browser", myConfig['mail_server']], stdout=FNULL, stderr=subprocess.STDOUT)
+	pass
