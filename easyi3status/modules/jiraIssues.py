@@ -81,7 +81,7 @@ def handleClick(ev):
 		transitionId = zenity(
 			'--list',
 			'--title', key,
-			'--text', '<b>' + summary + ':</b> ' + description + '\n-<i>' + reporter + '</i>',
+			'--text', '<b>' + summary + ':</b>\n' + description + '\n-<i>' + reporter + '</i>',
 			'--column', 'ID', '--column', 'Transition',
 			transitions
 		).strip()
