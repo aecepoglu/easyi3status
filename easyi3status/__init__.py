@@ -10,18 +10,45 @@ import ConfigParser, os, sys
 class EasyI3Status:
 
 	sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+
+	# keeps a dict of modules in the form:
+	#  {
+	# 	module1: { timeout: T, module: M, latestValues: V },
+	# 	module2: { timeout: T, module: M, latestValues: V },
+	# 	...
+	#  }
+	# where
+	#	T is timestamp until V is valid. Once current time is ahead of T, V will be updated
+	#	M is the module instance
 	modules = collections.OrderedDict()
+	DEFAULT_TIMEOUT_PERIOD = 60
 
 	def readModules(self):
+		now = time.time()
+
 		elements = []
+
 		for modName, mod in self.modules.iteritems():
-			fetched = mod.query()
+			module = mod['module']
+
+			if mod['timeout'] > now:
+				elements = elements + mod['latestValues']
+				continue
+			elif hasattr(module, 'timeoutPeriod'):
+				mod['timeout'] = now + module.timeoutPeriod
+			else:
+				mod['timeout'] = now + self.DEFAULT_TIMEOUT_PERIOD
+
+			fetched = module.query()
+
 			for it in fetched:
 				it['instance'] = modName
 				elements.append(it)
-		
+
+			mod['latestValues'] = fetched
+
 		print json.dumps(elements) + ","
-		threading.Timer(10, self.readModules).start()
+		threading.Timer(1, self.readModules).start()
 
 	def run(self):
 		print '{"version":1, "click_events": true}'
@@ -39,9 +66,11 @@ class EasyI3Status:
 			module = __import__(name)
 
 			module.setup( dict(config.items(name)) )
-			self.modules[name] = module
-
-		elements = []
+			self.modules[name] = {
+				'module': module,
+				'timeout': 0,
+				'latestValues': []
+			}
 
 		self.readModules()
 
@@ -55,10 +84,12 @@ class EasyI3Status:
 			
 			jsonobj = json.loads(line)
 
-			module = self.modules[jsonobj['instance']]
+			moduleContainer = self.modules[jsonobj['instance']]
+			module = moduleContainer['module']
 
 			if hasattr(module, 'handleClick'):
-				module.handleClick(jsonobj)
+				if module.handleClick(jsonobj):
+					moduleContainer['timeout'] = 0
 
 def run():
 	app = EasyI3Status()
