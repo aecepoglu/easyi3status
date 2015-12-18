@@ -5,7 +5,7 @@ _STATE_COUNTING = 1
 _STATE_PAUSED = 2
 
 _state = _STATE_OFF
-_value = 'stopwatch'
+_value = " " + u"\u231A" + " "
 
 _LONG_WAIT_PERIOD = 600
 timeoutPeriod = _LONG_WAIT_PERIOD
@@ -49,6 +49,10 @@ def handleClick(ev):
 			_state = _STATE_COUNTING
 			timeoutPeriod = tickPeriod
 	else:
-		_value = 0
+		if _state == _STATE_PAUSED:
+			_value = " " + u"\u231A" + " "
+			_state = _STATE_OFF
+		else:
+			_value = 0
 	
 	return True

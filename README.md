@@ -11,7 +11,8 @@
 
     # place this in your i3 config
     bar {
-    	status_command easyi3status
+		status_command easyi3status
+		font pango:Monospace Sans Mono, Icons 10 # Replace with your favorite font with Unicode support.
     }
 
 And you're ready to go
