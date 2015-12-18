@@ -10,6 +10,8 @@ statusColors = {
 	"In Progress": "#268bd2"
 }
 
+timeoutPeriod = 60
+
 def setup(config):
 	global myConfig, myAuth
 	myConfig = config
@@ -88,5 +90,6 @@ def handleClick(ev):
 
 		if transitionId:
 			transit(key, transitionId)
+			return True
 	except ErrorReturnCode:
 		pass

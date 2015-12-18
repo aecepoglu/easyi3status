@@ -15,6 +15,8 @@ statusColors = {
 	"In Progress": "#268bd2"
 }
 
+timeoutPeriod = 30
+
 def setup(config):
 	global myConfig
 	myConfig = config
@@ -64,4 +66,4 @@ def query():
 def handleClick(ev):
 	FNULL = open(os.devnull, 'w')
 	ret = subprocess.call(["sensible-browser", myConfig['mail_server']], stdout=FNULL, stderr=subprocess.STDOUT)
-	pass
+	return True
