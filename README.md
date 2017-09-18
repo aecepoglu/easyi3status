@@ -145,3 +145,7 @@ hello aecepoglu 1
 hello aecepoglu 2
 ...
 ```
+
+#### 6. Share your plugin
+
+Just submit your plugin [here](http://easyi3status.herokuapp.com/assets). Enter its github url (eg. http://github.com/aecepoglu/easyi3status-date-plugin) to *Repo URL* field.
