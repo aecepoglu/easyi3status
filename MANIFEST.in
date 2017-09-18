@@ -1,3 +1,0 @@
-include README.md
-include easyi3status/config.cfg
-recursive-include easyi3status/modules *

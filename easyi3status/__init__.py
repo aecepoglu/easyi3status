@@ -1,99 +1,84 @@
-import json
-import fileinput
-import threading
-import sys
-import time
-import collections
+#!/usr/bin/env python3
 
-import ConfigParser, os, sys
+import collections
+import fileinput
+import os
+import sys
+import threading
+
+from importlib import import_module
+from json import load as loadJson, dumps as dumpJson
+from statusModule import EasyI3StatusModule
+from time import time, sleep
+from yaml import load as loadYaml
 
 class EasyI3Status:
-
-	sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-
-	# keeps a dict of modules in the form:
-	#  {
-	# 	module1: { timeout: T, module: M, latestValues: V },
-	# 	module2: { timeout: T, module: M, latestValues: V },
-	# 	...
-	#  }
-	# where
-	#	T is timestamp until V is valid. Once current time is ahead of T, V will be updated
-	#	M is the module instance
-	modules = collections.OrderedDict()
+	modules = []
 	DEFAULT_TIMEOUT_PERIOD = 60
+	configDir = os.path.expanduser('~/.config/easyi3status')
 
 	def readModules(self):
-		now = time.time()
+		now = time()
 
 		elements = []
 
-		for modName, mod in self.modules.iteritems():
-			module = mod['module']
+		for mod in self.modules:
+			if mod.validUntil < now:
+				mod.update()
+				mod.validUntil = now + mod.validDuration
 
-			if mod['timeout'] > now:
-				elements = elements + mod['latestValues']
-				continue
-			elif hasattr(module, 'timeoutPeriod'):
-				mod['timeout'] = now + module.timeoutPeriod
-			else:
-				mod['timeout'] = now + self.DEFAULT_TIMEOUT_PERIOD
+			elements = elements + mod.values
 
-			fetched = module.query()
+		print(dumpJson(elements) + ',')
+		sys.stdout.flush()
+	
+	def loadConfig(self):
+		fp = open(os.path.join(self.configDir, 'config.yaml'))
+		values = loadYaml(fp)
+		fp.close()
 
-			for it in fetched:
-				it['instance'] = modName
-				elements.append(it)
+		if 'modules' not in values:
+			raise '"modules" not in config'
 
-			mod['latestValues'] = fetched
+		modConfigs = values['modules']
 
-		print json.dumps(elements) + ","
-		threading.Timer(1, self.readModules).start()
+		for i in range(len(modConfigs)):
+			it = modConfigs[i]
+			if type(it) is str:
+				it = {
+					'name': it
+				}
+				modConfigs[i] = it
+			elif type(it) is not dict:
+				raise 'bad config at index ' + str(i) + '. It should be a dict'
+
+			if 'config' not in it:
+				it['config'] = {}
+
+		return values
 
 	def run(self):
-		print '{"version":1, "click_events": true}'
-		print '['
+		print('{"version":1, "click_events": false}\n[')
+
+		config = self.loadConfig()
+
+		sys.path.append(os.path.join(self.configDir, 'modules/'))
 
 
-		config = ConfigParser.ConfigParser()
-		config.read([
-			os.path.expanduser('~/.easyi3status/config.cfg')
-		])
+		for it in config["modules"]:
+			module = import_module(it['name']).Module
 
-		sys.path.append(os.path.expanduser('~/.easyi3status/modules/'))
+			if not issubclass(module, EasyI3StatusModule):
+				raise 'module must be subclass of EasyI3StatusModule'
 
-		for name in config.sections():
-			module = __import__(name)
+			moduleInstance = module(it['config'])
+			moduleInstance.setDefaults()
+			self.modules.append(moduleInstance)
 
-			module.setup( dict(config.items(name)) )
-			self.modules[name] = {
-				'module': module,
-				'timeout': 0,
-				'latestValues': []
-			}
-
-		self.readModules()
-
-		sys.stdin.readline()
-
-		while 1:
-			line = sys.stdin.readline()
-
-			if line.startswith(","):
-				line = line[1:]
-			
-			jsonobj = json.loads(line)
-
-			moduleContainer = self.modules[jsonobj['instance']]
-			module = moduleContainer['module']
-
-			if hasattr(module, 'handleClick'):
-				if module.handleClick(jsonobj):
-					moduleContainer['timeout'] = 0
-
-def run():
-	app = EasyI3Status()
-	app.run()
+		while True:
+			self.readModules()
+			sleep(1)
 
 if __name__ == '__main__':
-	run()
+	app  = EasyI3Status()
+	app.run()
