@@ -4,11 +4,50 @@ An easy and modular i3-status application.
 
 ## To Install
 
-**TODO**
+pip installer is on its way.
+
+To install manually:
+
+1. `git clone git@github.com:aecepoglu/easyi3status.git`
+2. edit your `~/.i3/config` like so
+
+    bar {
+        status_command python3 /YOUR/PATH/TO/easyi3status/__init__.py
+        font pango:Monospace Sans Mono, Icons 10
+    }
+3. Add a module (follow the instructions here: [link](http://easyi3status.herokuapp.com/assets/1))
+4. Create the file `~/.config/easyi3status/config.yaml` like so:
+
+    modules:
 
 ## To Configure
 
-**TODO**
+The [yaml](http://yaml.org) configuration file is at `~/.config/easyi3status/config.yaml`.
+
+It must have a `modules` list under which you must enter the names of your modules (in the order you want them to appear left to right).
+
+Each module will have a `name` and a `config` section. Here is an example:
+
+    modules:
+    - name: weather
+      config:
+        city: 6955677
+        appid: <MY SECRET APP ID>
+        units: metric
+        language: tr
+        minWindSpeed: 5
+        wantedHours: [6,9,18,21]
+    - name: maildir
+      config:
+        path: /home/sahip/mail/inbox
+    - name: maildir
+      config:
+        path: /home/sahip/mail/dbb
+        label: dbb
+        hideIfZero: true
+    - name: date
+      config:
+        format: '%d-%m-%Y %H:%M'
 
 ### i3 Configuration
 
