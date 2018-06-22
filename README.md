@@ -2,6 +2,10 @@
 
 An easy and modular i3-status application.
 
+![demo](https://user-images.githubusercontent.com/3542195/41798886-11e9a626-7678-11e8-9cf1-f7dc8bd1273b.png)
+
+It is easy to use, mod and customize.
+
 ## To Install
 
 pip installer is on its way.
@@ -11,10 +15,11 @@ To install manually:
 1. `git clone git@github.com:aecepoglu/easyi3status.git`
 2. edit your `~/.i3/config` like so
 
-    bar {
-        status_command python3 /YOUR/PATH/TO/easyi3status/__init__.py
-        font pango:Monospace Sans Mono, Icons 10
-    }
+        bar {
+            status_command python3 /YOUR/PATH/TO/easyi3status/__init__.py
+            font pango:Monospace Sans Mono, Icons 10
+        }
+
 3. Add a module (follow the instructions here: [link](http://easyi3status.herokuapp.com/assets/1))
 4. Create the file `~/.config/easyi3status/config.yaml` like so:
 
